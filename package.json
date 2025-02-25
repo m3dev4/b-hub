@@ -5,7 +5,6 @@
   "description": "B-Hub est une plateforme qui combine les fonctionnalités d'un réseau social, d'un forum et d'un espace collaboratif dédié aux développeurs et acteurs de la tech au Sénégal. L'application vise à rassembler la communauté tech locale en facilitant le partage de projets, la discussion, le recrutement et l'organisation d'événements.",
   "main": "backend/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon backend/app.js",
     "dev": "nodemon backend/app.js",
     "build": "nodemon backend/app.js"
