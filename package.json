@@ -10,8 +10,21 @@
     "dev": "nodemon backend/app.js",
     "build": "nodemon backend/app.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "b-hub",
+    "tech",
+    "senegal",
+    "developer",
+    "collaboration",
+    "social",
+    "forum",
+    "collaborative",
+    "network",
+    "senegal",
+    "developer",
+    "collaboration"
+  ],
+  "author": "@M3DEV4",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
