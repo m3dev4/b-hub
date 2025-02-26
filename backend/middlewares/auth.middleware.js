@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import User from "../models/users/userModel";
-import asyncHandler from "./asyncHandler.middleware";
+import User from "../models/userModel.js";
+import asyncHandler from "./asyncHandler.middleware.js";
 
 const isAuthenticate = asyncHandler(async (req, res, next) => {
   let token;
@@ -18,12 +18,13 @@ const isAuthenticate = asyncHandler(async (req, res, next) => {
   }
 });
 
+
 const isAdmin = asyncHandler(async (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
-    next();
-  } else {
-    res.status(401).send("Vous n'êtes pas administrateur");
-  }
-});
+    if (req.user && req.user.role === "admin") {
+      next();
+    } else {
+      res.status(401).send("Vous n'êtes pas administrateur");
+    }
+  });
 
 export { isAuthenticate, isAdmin };

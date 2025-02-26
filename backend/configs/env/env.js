@@ -7,5 +7,6 @@ export const { PORT,
     NODE_ENV ,
     JWT_SECRET,
     MAILTRAP_TOKEN,
-    MAILTRAP_ENDPOINT
+    MAILTRAP_ENDPOINT,
+    BASE_URL_CLIENT
 } = process.env;

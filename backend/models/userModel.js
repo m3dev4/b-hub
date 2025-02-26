@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpire: { type: Date },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+    deletedAt: { type: Date, default: null },
+    lastLogin: { type: Date, default: null },
+    isOnline: { type: Boolean, default: false },
+    
   },
   { timestamps: true }
 );
