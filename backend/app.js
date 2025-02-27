@@ -3,8 +3,10 @@ import cookieParser from "cookie-parser";
 
 import ConnectDB from "./configs/database/index.js";
 import { PORT } from "./configs/env/env.js";
+
 import errorHandler from "./middlewares/errorHandler.middleware.js";
 import userRoutes from "./routes/userRoute.js";
+import postRoutes from "./routes/postRoute.js";
 
 const app = express();
 
@@ -17,6 +19,7 @@ ConnectDB();
 
 // Set up routes
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/posts", postRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello and Welcome to B-Hub. The server is running 🚀");

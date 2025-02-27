@@ -44,9 +44,9 @@ const commentSchema = new mongoose.Schema(
 );
 
 // Index pour récupérer tous les commentaires d'un post
-CommentSchema.index({ post: 1, createdAt: -1 });
+commentSchema.index({ post: 1, createdAt: -1 });
 // Index pour les réponses à un commentaire
-CommentSchema.index({ parentComment: 1 });
+commentSchema.index({ parentComment: 1 });
 
 const Comment = mongoose.model("Comment", commentSchema);
 

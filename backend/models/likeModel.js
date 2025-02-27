@@ -1,34 +1,26 @@
-// models/Like.js
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const likeSchema = new mongoose.Schema(
-  {
+const { Schema } = mongoose; // Ajoutez cette ligne
+
+const likeSchema = new Schema({
     user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    contentType: {
-      type: String,
-      enum: ["post", "comment"],
-      required: true,
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
     contentId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      refPath: "contentType",
+        type: Schema.Types.ObjectId,
+        required: true,
+        
+        // Ajoutez une référence au modèle de Post ou de Comment selon le cas
     },
-    reactionType: {
-      type: String,
-      enum: ["like", "celebrate", "support", "interesting", "curious"],
-      default: "like",
+    contentType: {
+        type: String,
+        enum: ['post', 'comment'],
+        required: true,
     },
-  },
-  { timestamps: true }
-);
+    // Ajoutez d'autres champs si nécessaire
+});
 
-likeSchema.index({ user: 1, contentType: 1, contentId: 1 }, { unique: true });
-
-const Like = mongoose.model("Like", likeSchema);
-
+const Like = mongoose.model('Like', likeSchema);
 export default Like;

@@ -25,7 +25,7 @@ const postSchema = new mongoose.Schema(
     ],
     postType: {
       type: String,
-      enum: ["post", "update", "article", "video", "event", "image", "general"],
+      enum: ["post", "update", "article", "video", "event", "image", "link", "general"],
       default: "general",
     },
     visibility: {
