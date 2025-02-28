@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ["user", "admin"], default: "user" },
     avatar: { type: String },
     bio: { type: String, maxLength: 30 },
-    skill: { type: [String], default: [] },
+    skills: { type: [String], default: [] },
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String },
     verificationTokenExpire: { type: Date },

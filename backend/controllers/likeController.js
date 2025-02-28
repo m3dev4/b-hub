@@ -3,6 +3,7 @@ import Post from '../models/postModel.js';
 import Comment from '../models/commentModel.js';
 import asyncHandler from '../middlewares/asyncHandler.middleware.js';
 import mongoose from 'mongoose'; // Import mongoose for ObjectId validation
+import { createNotification } from '../services/notifyService.js';
 
 // Like content
 export const likeContent = asyncHandler(async (req, res) => {
@@ -38,6 +39,14 @@ export const likeContent = asyncHandler(async (req, res) => {
         user: req.user._id,
         reactionType: reactionType || null,
     });
+
+    await createNotification({
+        recipient: content.author,
+        type: 'like',
+        content: `${req.user.userName} a aimé votre ${contentType}`,
+        releatedPost: content._id,
+        sender: req.user._id
+    })
 
     await like.save();
 
@@ -106,7 +115,7 @@ export const getLikesByContent = asyncHandler(async (req, res) => {
     // Récupérer les likes avec pagination
     const { page = 1, limit = 10 } = req.query;
     const likes = await Like.find({ contentId, contentType })
-        .populate('userId', 'username profilePicture')
+        .populate('userId', 'userName profilePicture')
         .skip((page - 1) * limit)
         .limit(limit);
 
