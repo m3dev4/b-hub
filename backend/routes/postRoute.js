@@ -19,10 +19,11 @@ import {
   likeContent,
   unlikeContent,
 } from "../controllers/likeController.js";
+import upload from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
-router.post("/post-create", isAuthenticate, createPost);
+router.post("/post-create", isAuthenticate, upload.array('media', 5), createPost);
 router.get("/:postId", isAuthenticate, getPostById);
 router.put("/post-update/:postId", isAuthenticate, updatePost);
 router.delete("/post-delete/:postId", isAuthenticate, deletePost);

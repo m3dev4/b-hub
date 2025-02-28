@@ -8,5 +8,6 @@ export const { PORT,
     JWT_SECRET,
     MAILTRAP_TOKEN,
     MAILTRAP_ENDPOINT,
-    BASE_URL_CLIENT
+    BASE_URL_CLIENT,
+    ARCJET_KEY
 } = process.env;

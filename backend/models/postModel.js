@@ -14,18 +14,29 @@ const postSchema = new mongoose.Schema(
     },
     mediaUrls: [
       {
-        type: String,
-        validate: function (url) {
-          return /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(
-            url
-          );
+        url: {
+          type: String,
+          required: true,
         },
-        message: "URL invalide",
+        type: {
+          type: String,
+          enum: ["image", "video"],
+          required: true,
+        },
       },
     ],
     postType: {
       type: String,
-      enum: ["post", "update", "article", "video", "event", "image", "link", "general"],
+      enum: [
+        "post",
+        "update",
+        "article",
+        "video",
+        "event",
+        "image",
+        "link",
+        "general",
+      ],
       default: "general",
     },
     visibility: {

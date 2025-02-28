@@ -7,11 +7,15 @@ import {
 
 // Create a new post
 export const createPost = asyncHandler(async (req, res) => {
-  const { content, mediaUrls, postType, visibility, mentions, tags } = req.body;
+  const { content, postType, visibility, mentions, tags } = req.body;
+  let mediaUrls = [];
 
-  // Validate mediaUrls and mentions
-  if (mediaUrls && !validateMediaUrls(mediaUrls)) {
-    return res.status(400).json({ message: "Invalid media URLs" });
+  //  Traitement des fichier uploadés
+  if (req.files && req.files.length > 0) {
+    mediaUrls = req.files.map(file => ({
+      url: `uploads/${file.filename}`,
+      type: file.mimetype.startsWith("image/") ? "image" : "video"
+    }))
   }
 
   if (mentions && !(await validateMentions(mentions))) {
@@ -31,7 +35,11 @@ export const createPost = asyncHandler(async (req, res) => {
     });
 
     await post.save();
-    return res.status(201).json(post);
+    return res.status(201).json({
+      message: "Post created successfully",
+      success: true,
+      data: post
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error creating post" });
