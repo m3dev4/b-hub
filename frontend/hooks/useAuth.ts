@@ -2,6 +2,7 @@ import { useAuthStore } from "@/api/stores/useAuthStore";
 import { authApi } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -17,8 +18,16 @@ export const useAuth = () => {
     },
     onError: () => {
       setUser(null);
+      router.push("/");
     },
   });
+
+  // Vérifier l'authentification au chargement
+  useEffect(() => {
+    if (!isLoading && !currentUser) {
+      router.push("/");
+    }
+  }, [currentUser, isLoading, router]);
 
   const loginMutation = useMutation({
     mutationFn: ({
@@ -31,7 +40,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setUser(data.user);
       queryClient.setQueryData(["currentUser"], data.user);
-      router.push("/dashboard");
+      router.push("/pages/dashboard");
     },
   });
 
@@ -40,7 +49,7 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setUser(data.user);
       queryClient.setQueryData(["currentUser"], data.user);
-      router.push("/dashboard");
+      router.push("/auth/verify-email");
     },
   });
 
@@ -49,7 +58,14 @@ export const useAuth = () => {
     onSuccess: () => {
       logoutStore();
       queryClient.removeQueries({ queryKey: ["currentUser"] });
-      router.push("/auth/login");
+      router.push("/");
+    },
+  });
+
+  const verifyEmailMutation = useMutation({
+    mutationFn: authApi.verifyEmail,
+    onSuccess: () => {
+      router.push("/pages/dashboard");
     },
   });
 
@@ -62,5 +78,7 @@ export const useAuth = () => {
     isLoginLoading: loginMutation.isPending,
     isRegisterLoading: registerMutation.isPending,
     isLogoutLoading: logoutMutation.isPending,
+    verifyEmail: verifyEmailMutation,
+    isVerifyEmailLoading: verifyEmailMutation.isPending,
   };
 };

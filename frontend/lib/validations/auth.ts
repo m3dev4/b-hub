@@ -30,10 +30,15 @@ export const forgotPasswordSchema = z.object({
 });
 
 export const verifyEmailSchema = z.object({
-  code: z.string().min(6, "Code requis"),
+  code0: z.string().length(1, "Code requis").regex(/^\d$/, "Chiffre requis"),
+  code1: z.string().length(1, "Code requis").regex(/^\d$/, "Chiffre requis"),
+  code2: z.string().length(1, "Code requis").regex(/^\d$/, "Chiffre requis"),
+  code3: z.string().length(1, "Code requis").regex(/^\d$/, "Chiffre requis"),
+  code4: z.string().length(1, "Code requis").regex(/^\d$/, "Chiffre requis"),
+  code5: z.string().length(1, "Code requis").regex(/^\d$/, "Chiffre requis"),
 });
 
 export type SignInSchema = z.infer<typeof signInSchema>;
-type SignUpSchema = z.infer<typeof signUpSchema>;
+export type SignUpSchema = z.infer<typeof signUpSchema>;
 type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
-type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;
+export type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;

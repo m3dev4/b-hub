@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import SignInPage from "@/auth/(authentification)/sign-in/[..sign-in]/page";
 import ParticleBackground from "@/components/particleBackground";
 import useGlobeAnimation from "@/hooks/useGlobeAnimation";
 import { useIsMobile } from "@/hooks/useMobile";
 import ProgrammingLanguageIcons from "@/components/programmingLangage";
 import { Code, Users, Zap } from "lucide-react";
 import { GlobeDemo } from "@/components/globeDemo";
+import AuthForm from "@/app/auth/authForm";
 
 const PageHome = () => {
   const { isLoaded, isAnimating } = useGlobeAnimation();
@@ -159,7 +159,7 @@ const PageHome = () => {
               </div>
             </div>
             <div className={`w-full ${useIsMobile() ? 'mt-8 mb-16' : 'h-screen w-1/2'} flex items-center justify-center p-6 transition-transform duration-1000 ${isAnimating ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
-          <SignInPage />
+          <AuthForm />
         </div>
           </div>
         </div>

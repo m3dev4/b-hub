@@ -1,5 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
+
 import fs from "fs";
 import path from "path";
 
@@ -26,10 +27,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Keep this after body parsers
 
+
 // Use security middleware
 app.use(helmetMiddleware());
 app.use(limiter);
-// app.use(corsMiddleware)
+app.use(corsMiddleware)
 // app.use(potentialIntrusionMiddleware);
 app.use(loggingMiddleware);
 

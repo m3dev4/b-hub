@@ -7,7 +7,7 @@ const apiInstance = axios.create({
 
 export const authApi = {
   login: async (identifier: string, password: string) => {
-    const response = await apiInstance.post("/api/v1/auth/login", {
+    const response = await apiInstance.post("/api/v1/users/login", {
       identifier,
       password,
     });
@@ -21,17 +21,17 @@ export const authApi = {
     email: string;
     password: string;
   }) => {
-    const response = await apiInstance.post("/api/v1/auth/register", userData);
+    const response = await apiInstance.post("/api/v1/users/register", userData);
     return response.data;
   },
 
   logout: async () => {
-    const response = await apiInstance.post("/api/v1/auth/logout");
+    const response = await apiInstance.post("/api/v1/users/logout");
     return response.data;
   },
 
   getProfile: async () => {
-    const response = await apiInstance.get("/api/v1/auth/profile");
+    const response = await apiInstance.get("/api/v1/users/profile");
     return response.data;
   },
 
@@ -74,4 +74,10 @@ export const authApi = {
     return response.data;
   },
   
+  verifyEmail: async (code: string) => {
+    const response = await apiInstance.post("/api/v1/users/verify-email", {
+      code,
+    });
+    return response.data;
+  },
 };

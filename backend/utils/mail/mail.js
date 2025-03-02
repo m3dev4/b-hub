@@ -1,18 +1,18 @@
 // emailService.js
-import { clientMail, sender } from "./configMailer.js";
+import { transporter, sender } from "./configMailer.js";
 import { templateSendWelcomeEmail, validateMail, templateForgotPassword, templateSendResetPasswordSucces } from "./templateMail.js";
 
 export const sendEmailVerication = async (email, verificationToken) => {
   try {
-    // Utilisation du client mail configuré avec le bon format de destinataire
-    const response = await clientMail.sendMail({
-      from: sender,
-      to: email, // On peut utiliser directement l'email comme chaîne de caractères
+    const mailOptions = {
+      from: `${sender.name} <${sender.address}>`,
+      to: email,
       subject: "Email verification",
       html: validateMail.replace("{verificationCode}", verificationToken),
       category: "Email verification",
-    });
-    
+    };
+
+    const response = await transporter.sendMail(mailOptions);
     console.log("Email envoyé avec succès", response);
     return response;
   } catch (error) {
@@ -23,15 +23,15 @@ export const sendEmailVerication = async (email, verificationToken) => {
 
 export const sendWelcomeEmail = async (email, userName) => {
   try {
-    // Utilisation du client mail configuré avec le bon format de destinataire
-    const response = await clientMail.sendMail({
-      from: sender,
-      to: email, // On peut utiliser directement l'email comme chaîne de caractères
+    const mailOptions = {
+      from: `${sender.name} <${sender.address}>`,
+      to: email,
       subject: "Welcome to B-Hub",
       html: templateSendWelcomeEmail.replace("{userName}", userName),
       category: "Welcome email",
-    });
-    
+    };
+
+    const response = await transporter.sendMail(mailOptions);
     console.log("Email envoyé avec succès", response);
     return response;
   } catch (error) {
@@ -42,15 +42,17 @@ export const sendWelcomeEmail = async (email, userName) => {
 
 export const sendForgotPasswordEmail = async (email, userName, resetToken) => {
   try {
-    // Utilisation du client mail configuré avec le bon format de destinataire
-    const response = await clientMail.sendMail({
-      from: sender,
-      to: email, // On peut utiliser directement l'email comme chaîne de caractères
+    const mailOptions = {
+      from: `${sender.name} <${sender.address}>`,
+      to: email,
       subject: "Forgot Password",
-      html: templateForgotPassword.replace("{nomUtilisateur}", userName).replace("{lienResetPassword}", resetToken),
+      html: templateForgotPassword
+        .replace("{nomUtilisateur}", userName)
+        .replace("{lienResetPassword}", resetToken),
       category: "Forgot password email",
-    });
-    
+    };
+
+    const response = await transporter.sendMail(mailOptions);
     console.log("Email envoyé avec succès", response);
     return response;
   } catch (error) {
@@ -61,15 +63,17 @@ export const sendForgotPasswordEmail = async (email, userName, resetToken) => {
 
 export const sendResetPasswordSucces = async (email, userName, resetToken) => {
   try {
-    // Utilisation du client mail configuré avec le bon format de destinataire
-    const response = await clientMail.sendMail({
-      from: sender,
-      to: email, // On peut utiliser directement l'email comme chaîne de caractères
+    const mailOptions = {
+      from: `${sender.name} <${sender.address}>`,
+      to: email,
       subject: "Reset Password",
-      html: templateSendResetPasswordSucces.replace("{nomUtilisateur}", userName).replace("{lienConnexion}", resetToken),
+      html: templateSendResetPasswordSucces
+        .replace("{nomUtilisateur}", userName)
+        .replace("{lienConnexion}", resetToken),
       category: "Reset password email",
-    });
-    
+    };
+
+    const response = await transporter.sendMail(mailOptions);
     console.log("Email envoyé avec succès", response);
     return response;
   } catch (error) {
