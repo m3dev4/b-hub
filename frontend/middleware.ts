@@ -6,14 +6,17 @@ export function middleware(request: NextRequest) {
   const isAuthPage =
     request.nextUrl.pathname.startsWith("/auth") ||
     request.nextUrl.pathname === "/";
+  const isVerifyEmailPage = request.nextUrl.pathname === "/auth/verify-email";
 
   // Si l'utilisateur est sur une page d'auth alors qu'il est déjà connecté
-  if (isAuthenticated && isAuthPage) {
+  // mais permettre l'accès à la page de vérification email
+  if (isAuthenticated && isAuthPage && !isVerifyEmailPage) {
     return NextResponse.redirect(new URL("/pages/dashboard", request.url));
   }
 
   // Si l'utilisateur n'est pas authentifié et essaie d'accéder à une page protégée
-  if (!isAuthenticated && !isAuthPage) {
+  // Permettre l'accès à la page de vérification email même sans authentification
+  if (!isAuthenticated && !isAuthPage && !isVerifyEmailPage) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

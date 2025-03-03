@@ -40,7 +40,7 @@ const createUser = asyncHandler(async (req, res) => {
       verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000,
     });
     await newUser.save();
-    createToken(res, newUser._id);
+    // Ne pas créer de token JWT ici
     await sendEmailVerication(newUser.email, verificationToken);
     res.status(201).json({
       message: "Utilisateur créé avec succès",
@@ -177,6 +177,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 // @desc email verification
+// @desc email verification
 const verifyEmail = asyncHandler(async (req, res) => {
   const { code } = req.body;
   try {
@@ -194,24 +195,15 @@ const verifyEmail = asyncHandler(async (req, res) => {
     user.verificationToken = undefined;
     user.verificationTokenExpire = undefined;
 
-    console.log("email delivré", code);
-
     await user.save();
-    await sendWelcomeEmail(user.email, user.userName);
+    // Créer le token JWT après vérification de l'email
+    createToken(res, user._id);
     res.status(200).json({
       success: true,
       message: "Email verified successfully",
-      user: {
-        ...user._doc,
-        password: undefined,
-      },
     });
   } catch (error) {
-    console.log("Error during email verification", error);
-    return res.status(500).json({
-      message: "Erreur lors de la verification de l'email",
-      success: false,
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 

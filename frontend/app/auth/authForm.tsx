@@ -49,9 +49,7 @@ const AuthForm = () => {
         email: data.email,
         password: data.password,
       });
-      if (register.isSuccess) {
-        
-      }
+      router.push("/auth/verify-email");
     } catch (error: any) {
       setError(error.response?.data?.message);
     }

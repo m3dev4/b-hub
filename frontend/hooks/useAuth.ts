@@ -18,13 +18,18 @@ export const useAuth = () => {
     },
     onError: () => {
       setUser(null);
-      router.push("/");
+      // Ne pas rediriger automatiquement ici
+      // router.push("/");
     },
   });
 
   // Vérifier l'authentification au chargement
   useEffect(() => {
-    if (!isLoading && !currentUser) {
+    const pathname = window.location.pathname;
+    const isVerifyEmailPage = pathname === "/auth/verify-email";
+    
+    // Ne pas rediriger si on est sur la page de vérification d'email
+    if (!isLoading && !currentUser && !isVerifyEmailPage) {
       router.push("/");
     }
   }, [currentUser, isLoading, router]);
@@ -47,9 +52,10 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: authApi.regster,
     onSuccess: (data) => {
-      setUser(data.user);
-      queryClient.setQueryData(["currentUser"], data.user);
-      router.push("/auth/verify-email");
+      // Ne pas définir l'utilisateur comme connecté après l'inscription
+      // car l'email n'est pas encore vérifié
+      queryClient.setQueryData(["currentUser"], null);
+      // Ne pas rediriger ici, laisser le composant gérer la redirection
     },
   });
 
