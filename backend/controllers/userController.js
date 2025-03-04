@@ -59,41 +59,50 @@ const createUser = asyncHandler(async (req, res) => {
 
 // @desc login
 const login = asyncHandler(async (req, res) => {
-  const { identifier, password } = req.body; // Renommez 'email' en 'identifier'
+  const { identifier, password } = req.body;
 
   if (!identifier || !password) {
     return res.status(400).json({
-      message:
-        "Veuillez fournir un nom d'utilisateur ou un email et un mot de passe",
+      message: "Veuillez fournir un identifiant et un mot de passe"
     });
   }
 
-  // Rechercher l'utilisateur par email ou username
+  // Rechercher l'utilisateur
   const user = await User.findOne({
-    $or: [{ email: identifier }, { userName: identifier }],
+    $or: [{ email: identifier }, { userName: identifier }]
   });
 
   if (!user) {
-    return res.status(404).json({ message: "Utilisateur non trouvé" });
+    return res.status(404).json({ 
+      success: false,
+      message: "Identifiants incorrects" 
+    });
   }
 
   const isPasswordCorrect = await bcryptjs.compare(password, user.password);
   if (!isPasswordCorrect) {
-    return res.status(401).json({ message: "Le mot de passe est incorrect" });
+    return res.status(401).json({ 
+      success: false,
+      message: "Identifiants incorrects" 
+    });
   }
 
   // Mettre à jour le dernier login
   user.lastLogin = Date.now();
-  user.isOnline = true;
-
   await user.save();
 
+  // Créer le token JWT
   createToken(res, user._id);
+
+  // Renvoyer la réponse avec toutes les informations nécessaires
   res.status(200).json({
-    message: "Connexion réussie",
     success: true,
-    ...user._doc,
-    password: undefined,
+    user: {
+      ...user._doc,
+      password: undefined,
+      isVerified: user.isVerified,
+      hasCompletedOnboarding: user.hasCompletedOnboarding
+    }
   });
 });
 
@@ -132,12 +141,30 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       throw new Error("Utilisateur non trouvé");
     }
 
-    // Modification
-    if (req.body.userName) user.userName = req.body.userName;
-    if (req.body.email) user.email = req.body.email;
+    const updateData = req.body;
 
-    if (req.body.password) {
-      const hashedPassword = await bcryptjs.hash(req.body.password, 10);
+    // Parse les skills depuis le FormData
+    if (updateData.skills) {
+      try {
+        updateData.skills = JSON.parse(updateData.skills);
+        if (!Array.isArray(updateData.skills)) {
+          throw new Error('Skills doit être un tableau');
+        }
+      // eslint-disable-next-line no-unused-vars
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: 'Format des skills invalide'
+        });
+      }
+    }
+
+    // Modification
+    if (updateData.userName) user.userName = updateData.userName;
+    if (updateData.email) user.email = updateData.email;
+
+    if (updateData.password) {
+      const hashedPassword = await bcryptjs.hash(updateData.password, 10);
       user.password = hashedPassword;
     }
 
@@ -164,6 +191,56 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc onBoardingUpdate
+const updateOnboardingProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    return res.status(404).json({ message: "Utilisateur non trouvé" });
+  }
+  try {
+    const fieldsToUpdate = [
+      "title",
+      "bio",
+      "website",
+      "location",
+      "skills", 
+      "currentPosition",
+      "linkedinProfile",
+    ];
+    let avatar = user.avatar;
+
+    if (req.files && req.files.length > 0) {
+      avatar = req.files[0].filename;
+    }
+
+    fieldsToUpdate.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        user[field] = req.body[field];
+      }
+    });
+
+    if (req.body.skills) {
+      user.skills = req.body.skills;
+    }
+
+    const updateUser = await user.save();
+    res.status(200).json({
+      message: "Profil mis à jour",
+      success: true,
+      user: updateUser,
+      hasCompletedOnboarding: true ,
+      avatar,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 // @desc delete
 const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
@@ -176,7 +253,6 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc email verification
 // @desc email verification
 const verifyEmail = asyncHandler(async (req, res) => {
   const { code } = req.body;
@@ -322,6 +398,7 @@ export {
   login,
   logout,
   verifyEmail,
+  updateOnboardingProfile,
   forgotPassword,
   resetPassword,
   getUserProfile,

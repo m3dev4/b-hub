@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/api/stores/useAuthStore";
 import { authApi } from "@/lib/api";
+import { User } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -9,17 +10,15 @@ export const useAuth = () => {
   const router = useRouter();
   const { setUser, logout: logoutStore } = useAuthStore();
 
-  const { data: currentUser, isLoading } = useQuery({
+  const { data: currentUser, isLoading } = useQuery<User | null, Error>({
     queryKey: ["currentUser"],
     queryFn: authApi.getProfile,
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: (data: User | null) => {
       setUser(data);
     },
     onError: () => {
       setUser(null);
-      // Ne pas rediriger automatiquement ici
-      // router.push("/");
     },
   });
 
@@ -33,29 +32,21 @@ export const useAuth = () => {
       router.push("/");
     }
   }, [currentUser, isLoading, router]);
-
   const loginMutation = useMutation({
-    mutationFn: ({
-      identifier,
-      password,
-    }: {
-      identifier: string;
-      password: string;
-    }) => authApi.login(identifier, password),
+    mutationFn: (credentials: { identifier: string, password: string }) => authApi.login(credentials.identifier, credentials.password),
     onSuccess: (data) => {
-      setUser(data.user);
-      queryClient.setQueryData(["currentUser"], data.user);
-      router.push("/pages/dashboard");
+      setUser(data);
+      queryClient.setQueryData(["currentUser"], data);
+      router.push('/pages/dashboard'); // Direct au dashboard pour les utilisateurs existants
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: authApi.regster,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSuccess: (data) => {
-      // Ne pas définir l'utilisateur comme connecté après l'inscription
-      // car l'email n'est pas encore vérifié
-      queryClient.setQueryData(["currentUser"], null);
-      // Ne pas rediriger ici, laisser le composant gérer la redirection
+      // Après l'inscription, rediriger vers la vérification d'email
+      router.push("/auth/verify-email");
     },
   });
 
@@ -70,8 +61,11 @@ export const useAuth = () => {
 
   const verifyEmailMutation = useMutation({
     mutationFn: authApi.verifyEmail,
-    onSuccess: () => {
-      router.push("/pages/dashboard");
+    onSuccess: (data) => {
+      // Après vérification d'email, rediriger vers l'onboarding
+      document.cookie = "email_verified=true; path=/";
+      queryClient.setQueryData(["currentUser"], data.user);
+      router.push("/onboarding"); // Uniquement pour les nouveaux inscrits
     },
   });
 

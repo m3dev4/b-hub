@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import ParticleBackground from "@/components/particleBackground";
 import useGlobeAnimation from "@/hooks/useGlobeAnimation";
 import { useIsMobile } from "@/hooks/useMobile";

@@ -1,36 +1,62 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Définir les routes publiques
+const publicRoutes = [
+  '/',
+  '/auth/login',
+  '/auth/register',
+  '/auth/verify-email',
+  '/auth/forgot-password'
+];
+
+// Définir les routes protégées
+const protectedRoutes = [
+  '/pages/dashboard',
+  '/pages/profile',
+  '/pages/settings'
+];
+
 export function middleware(request: NextRequest) {
   const isAuthenticated = request.cookies.has("jwt");
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith("/auth") ||
-    request.nextUrl.pathname === "/";
-  const isVerifyEmailPage = request.nextUrl.pathname === "/auth/verify-email";
+  const path = request.nextUrl.pathname;
 
-  // Si l'utilisateur est sur une page d'auth alors qu'il est déjà connecté
-  // mais permettre l'accès à la page de vérification email
-  if (isAuthenticated && isAuthPage && !isVerifyEmailPage) {
-    return NextResponse.redirect(new URL("/pages/dashboard", request.url));
+  // Vérifier si c'est une route publique
+  const isPublicRoute = publicRoutes.includes(path);
+  // Vérifier si c'est une route protégée
+  const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
+
+  // Si l'utilisateur n'est pas authentifié
+  if (!isAuthenticated) {
+    // Bloquer l'accès aux routes protégées
+    if (isProtectedRoute) {
+      const loginUrl = new URL('/', request.url);
+      loginUrl.searchParams.set('redirect', path);
+      loginUrl.searchParams.set('hl', 'fr');
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
   }
 
-  // Si l'utilisateur n'est pas authentifié et essaie d'accéder à une page protégée
-  // Permettre l'accès à la page de vérification email même sans authentification
-  if (!isAuthenticated && !isAuthPage && !isVerifyEmailPage) {
-    return NextResponse.redirect(new URL("/", request.url));
+  // Si l'utilisateur est authentifié
+  if (isAuthenticated && isPublicRoute) {
+    const dashboardUrl = new URL('/pages/dashboard', request.url);
+    dashboardUrl.searchParams.set('hl', 'fr');
+    return NextResponse.redirect(dashboardUrl);
   }
 
   return NextResponse.next();
 }
 
-// Configurer les chemins qui déclenchent le middleware
 export const config = {
   matcher: [
-    // Pages protégées
-    "/pages/:path*",
-    // Pages d'authentification
-    "/auth/:path*",
-    // Page racine
-    "/",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

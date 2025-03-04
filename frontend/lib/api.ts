@@ -80,4 +80,32 @@ export const authApi = {
     });
     return response.data;
   },
+
+  updateOnboardingProfile: async (formData: FormData) => {
+    try {
+      const response = await apiInstance.put("/api/v1/users/onboarding-profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Réponse brute:", response.data);
+
+      if (response.data.success) {
+        return {
+          success: true,
+          data: response.data.user
+        };
+      } else {
+        throw new Error(response.data.message || "Erreur lors de la mise à jour");
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Erreur API:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Erreur lors de la mise à jour du profil"
+      };
+    }
+  },
 };

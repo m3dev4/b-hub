@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const AuthForm = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [mode, setMode] = useState<"login" | "signup">("login");
   const { login, register } = useAuth();
   const [error, setError] = useState("");

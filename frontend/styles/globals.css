@@ -1,0 +1,12 @@
+/* Styles pour le composant FileUpload */
+.avatar-upload-container {
+  @apply relative w-32 h-32 rounded-full overflow-hidden border-2 border-dashed;
+}
+
+.avatar-upload-overlay {
+  @apply absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition-opacity;
+}
+
+.animate-blur-in {
+  @apply transition-all duration-300;
+} 

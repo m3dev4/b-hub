@@ -12,7 +12,9 @@ import {
   getAllUsers,
   getUserById,
   deleteUserById,
+  updateOnboardingProfile,
 } from "../controllers/userController.js";
+import upload from "../middlewares/upload.middleware.js";
 import { isAdmin, isAuthenticate } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -27,6 +29,7 @@ router.post("/reset-password/:token", resetPassword);
 
 router.get("/profile", isAuthenticate, getUserProfile);
 router.put("/profile/update-profile", isAuthenticate, updateUserProfile);
+router.put("/onboarding-profile", isAuthenticate, upload.single('avatar'), updateOnboardingProfile)
 router.delete("/profile/delete-profile", isAuthenticate, deleteUser);
 
 // -------------------Admin -------------------
