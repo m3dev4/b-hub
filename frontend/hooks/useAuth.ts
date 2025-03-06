@@ -1,3 +1,4 @@
+"use client"
 import { useAuthStore } from "@/api/stores/useAuthStore";
 import { authApi } from "@/lib/api";
 import { User } from "@/types";
@@ -15,6 +16,7 @@ export const useAuth = () => {
     queryFn: authApi.getProfile,
     retry: false,
     onSuccess: (data: User | null) => {
+      console.log("Données utilisateur récupérées :", data);
       setUser(data);
     },
     onError: () => {

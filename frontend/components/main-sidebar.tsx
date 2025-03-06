@@ -26,21 +26,25 @@ import { User } from "@/types";
 interface MainSidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  user: User
 }
 
 
 
-const MainSidebar = ({ activeTab, setActiveTab, user }: MainSidebarProps) => {
-    const  { logout } = useAuth()
+const MainSidebar = ({ activeTab, setActiveTab }: MainSidebarProps) => {
+    const  { logout, currentUser } = useAuth()
     const router = useRouter()
+
+    const handleNavigation = (item: typeof navItems[0]) => {
+      setActiveTab(item.label)
+      router.push(item.path)
+    }
 
     const handleLogout = () => {
         logout.mutate()
         router.push("/")
     }
   return (
-    <Sidebar variant="floating" collapsible="icon">
+    <Sidebar variant="floating" collapsible="icon" className="-ml-2 -mt-3 h-[104vh]">
       <SidebarHeader>
         <div className="flex items-center gap-2 py-2">
           <span className="text-xl font-bold">B-Hub</span>
@@ -63,7 +67,7 @@ const MainSidebar = ({ activeTab, setActiveTab, user }: MainSidebarProps) => {
             {navItems.map((item) => (
               <SidebarMenuItem
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleNavigation(item)}
                 className="list-none"
               >
                 <SidebarMenuButton
@@ -126,15 +130,15 @@ const MainSidebar = ({ activeTab, setActiveTab, user }: MainSidebarProps) => {
         <div className="p-4">
           <div className="flex items-center gap-3">
             <Image 
-              src={user?.avatar || "/images/placeholder.jpg"}
-              alt={user?.firstName || "User"}
+              src={currentUser?.avatar || "/images/placeholder.jpg"}
+              alt={currentUser?.userName || "User"}
               width={40}
               height={40}
               className="rounded-full"
             />
             <div className="flex flex-col">
-              <span className="font-medium">{user.firstName || "Utilisateur"}</span>
-              <span className="text-sm text-gray-500">{user.titleProfile || "Membre"}</span>
+              <span className="font-medium">{currentUser?.firstName || "Utilisateur"}</span>
+              <span className="text-sm text-gray-500">{currentUser?.titleProfile || "Membre"}</span>
             </div>
           </div>
         </div>

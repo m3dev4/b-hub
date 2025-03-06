@@ -1,42 +1,24 @@
-"use client"
-import MainSidebar from '@/components/main-sidebar'
-import { SidebarInset } from '@/components/ui/sidebar'
-import { useAuth } from '@/hooks/useAuth'
-import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
-import CommunityPage from '../community/page'
-import MeethubPage from '../meethub/page'
-import MessagePage from '../messages/page'
-import NotificationsPage from '../notifications/page'
-import ProfilePage from '../profile/page'
-import PostPage from '../post/page'
+"use client";
+import { useAuth } from "@/hooks/useAuth";
+import PostPage from "../post/page";
 
 const Accueil = () => {
-    const router = useRouter()
-    const { logout, currentUser, isLoading} = useAuth()
-    const [ activeTab, setActiveTab ] = useState("Accueil")
+  const { currentUser, isLoading } = useAuth();
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-
-    if (!currentUser) {
-        return null;
-    }
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className='flex min-h-screen'>
-        <MainSidebar activeTab={activeTab} setActiveTab={setActiveTab} user={currentUser} />
-        <SidebarInset >
-        {activeTab === "Accueil" && <PostPage />}
-        {activeTab === "community" && <CommunityPage />}
-        {activeTab === "meethub" && <MeethubPage />}
-        {activeTab === "messages" && <MessagePage />}
-        {activeTab === "notifications" && <NotificationsPage />}
-        {activeTab === "profile" && <ProfilePage />}
-      </SidebarInset>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold mb-6">Fil d&apos;actualité</h1>
+      <PostPage />
     </div>
-  )
-}
+  );
+};
 
-export default Accueil
+export default Accueil;
