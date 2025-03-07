@@ -31,10 +31,10 @@ router.get("/profile", isAuthenticate, getUserProfile);
 router.put("/profile/update-profile", isAuthenticate, updateUserProfile);
 router.put("/onboarding-profile", isAuthenticate, upload.single('avatar'), updateOnboardingProfile)
 router.delete("/profile/delete-profile", isAuthenticate, deleteUser);
+router.get("/profile/:id", isAuthenticate, getUserById);
 
 // -------------------Admin -------------------
 router.get("/admin/all-user", isAuthenticate, isAdmin, getAllUsers);
-router.get("/admin/user/:id", isAuthenticate, isAdmin, getUserById);
 router.delete("/admin/user/:id", isAuthenticate, isAdmin, deleteUserById);
 
 export default router;

@@ -59,6 +59,11 @@ export const authApi = {
     return response.data;
   },
 
+  getUserById: async (userId: string) => {
+    const response = await apiInstance.get(`/api/v1/users/profile/${userId}`);
+    return response.data;
+  },
+
   forgotPassword: async (email: string) => {
     const response = await apiInstance.post("/api/v1/auth/forgot-password", {
       email,

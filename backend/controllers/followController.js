@@ -5,7 +5,8 @@ import { createNotification } from '../services/notifyService.js';
 
 // Follow a user
 export const followUser = asyncHandler(async (req, res) => {
-    const { userId } = req.params;
+    try {
+        const { userId } = req.params;
     const followerId = req.user._id;
 
     // Check if user exists
@@ -41,6 +42,12 @@ export const followUser = asyncHandler(async (req, res) => {
     });
 
     res.status(201).json({ message: 'Utilisateur suivi avec succès' });
+    } catch (error) {
+        console.log("error du abonnement", error)
+        throw new Error('error')
+    }
+
+
 });
 
 // Unfollow a user

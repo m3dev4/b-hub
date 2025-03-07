@@ -52,3 +52,34 @@ export interface UpdateProfileData {
   website?: string;
   hasCompletedOnboarding?: boolean;
 }
+
+export interface Follow {
+  _id: string;
+  follower: User | string;
+  following: User | string;
+  createdAt: string;
+}
+
+export interface FollowResponse {
+  message: string;
+}
+
+export interface FollowersResponse {
+  data: Follow[];
+  total: number;
+}
+
+export interface FollowState {
+  followers: Follow[];
+  following: Follow[];
+  loadingFollow: boolean;
+  error: string | null;
+  totalFollowers: number;
+  totalFollowing: number;
+  followUser: (userId: string) => Promise<FollowResponse | null>;
+  unfollowUser: (userId: string) => Promise<FollowResponse | null>;
+  getFollowers: (userId: string, page?: number, limit?: number) => Promise<void>;
+  getFollowing: (userId: string, page?: number, limit?: number) => Promise<void>;
+  clearFollowState: () => void;
+  isFollowing: (userId: string) => boolean;
+}

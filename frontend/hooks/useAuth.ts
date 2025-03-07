@@ -61,6 +61,14 @@ export const useAuth = () => {
     },
   });
 
+  const getUserByIdMutation = useMutation({
+    mutationFn: authApi.getUserById,
+    onSuccess: (data) => {
+      setUser(data);
+      queryClient.setQueryData(["currentUser"], data);
+    },
+  });
+
   const verifyEmailMutation = useMutation({
     mutationFn: authApi.verifyEmail,
     onSuccess: (data) => {
@@ -82,5 +90,7 @@ export const useAuth = () => {
     isLogoutLoading: logoutMutation.isPending,
     verifyEmail: verifyEmailMutation,
     isVerifyEmailLoading: verifyEmailMutation.isPending,
+    getUserById: getUserByIdMutation,
+    isGetUserByIdLoading: getUserByIdMutation.isPending,
   };
 };
