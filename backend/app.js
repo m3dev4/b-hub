@@ -1,11 +1,13 @@
 import express from "express";
 import cookieParser from "cookie-parser";
+import http from "http"
 
 import fs from "fs";
 import path from "path";
 
 import ConnectDB from "./configs/database/index.js";
 import { PORT } from "./configs/env/env.js";
+import initializeSocket from "./configs/websocket/socket.js";
 
 import errorHandler from "./middlewares/errorHandler.middleware.js";
 import userRoutes from "./routes/userRoute.js";
@@ -21,6 +23,8 @@ import potentialIntrusionMiddleware from "./security/ids/potentialIntrusion.js";
 import loggingMiddleware from "./security/loggingMiddleware.js";
 
 const app = express();
+const server = http.createServer(app)
+const io = initializeSocket(server)
 
 // Set up middleware for parsing request bodies
 app.use(express.json());
@@ -31,7 +35,7 @@ app.use(cookieParser()); // Keep this after body parsers
 // Use security middleware
 app.use(helmetMiddleware());
 app.use(limiter);
-app.use(corsMiddleware)
+// app.use(corsMiddleware)
 // app.use(potentialIntrusionMiddleware);
 app.use(loggingMiddleware);
 
@@ -56,8 +60,14 @@ app.get("/", (req, res) => {
   res.send("Hello and Welcome to B-Hub. The server is running 🚀");
 });
 
+app.set("io", io);
+
 app.use(errorHandler);
+
 
 app.listen(PORT, () => {
   console.log(`Server B-Hub is now starting on port ${PORT} ⚡`);
 });
+
+
+export {app, server}

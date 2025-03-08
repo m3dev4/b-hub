@@ -67,3 +67,22 @@ export const markNotificationsAsRead = async (req, res) => {
     });
   }
 };
+
+export const getNotifications = async (userId) => {
+  return Notification.find({ recipient: userId })
+    .populate("sender")
+    .populate("releatedPost")
+    .sort({ createdAt });
+};
+
+export const markAsRead = async (notificationId) => {
+  return Notification.findByIdAndUpdate(
+    notificationId,
+    { read: true },
+    { new: true }
+  );
+};
+
+export const getUnreadCount = async (userId) => {
+  return Notification.countDocuments({ recipient: userId, read: false });
+};
