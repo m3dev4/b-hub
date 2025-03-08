@@ -6,7 +6,7 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Important pour les cookies d'authentification
+  withCredentials: true,
 });
 
 // Intercepteur pour ajouter le token d'authentification si nécessaire
@@ -38,7 +38,7 @@ export const instanceApi = {
   followUser: (userId: string) => api.post(`/api/follows/${userId}`),
   unfollowUser: (userId: string) => api.delete(`/api/follows/${userId}`),
   getFollowers: (userId: string, page = 1, limit = 10) =>
-    api.get(`/api/followers/${userId}/followers?page=${page}&limit=${limit}`),
+    api.get(`/api/follows/followers/${userId}?page=${page}&limit=${limit}`),
   getFollowing: (userId: string, page = 1, limit = 10) =>
-    api.get(`/api/following/${userId}/following?page=${page}&limit=${limit}`),
+    api.get(`/api/follows/following/${userId}?page=${page}&limit=${limit}`),
 };

@@ -1,9 +1,11 @@
+"use strict";
+
 import express from "express";
 import cookieParser from "cookie-parser";
-import http from "http"
-
+import http from "http";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import ConnectDB from "./configs/database/index.js";
 import { PORT } from "./configs/env/env.js";
@@ -12,34 +14,36 @@ import initializeSocket from "./configs/websocket/socket.js";
 import errorHandler from "./middlewares/errorHandler.middleware.js";
 import userRoutes from "./routes/userRoute.js";
 import postRoutes from "./routes/postRoute.js";
+import followRoutes from "./routes/followRoute.js";
 import notificationRoutes from "./routes/notificationRoute.js";
 import recommendationRoutes from "./routes/recommendationRoute.js";
-import followRoutes from "./routes/followRoute.js";
 
 import helmetMiddleware from "./security/helmet/helmet.js";
-import limiter from "./security/ratelimit/rateLimit.js";
 import corsMiddleware from "./security/cors/cors.js";
+import limiter from "./security/ratelimit/rateLimit.js";
 import potentialIntrusionMiddleware from "./security/ids/potentialIntrusion.js";
 import loggingMiddleware from "./security/loggingMiddleware.js";
 
 const app = express();
-const server = http.createServer(app)
-const io = initializeSocket(server)
+const server = http.createServer(app);
+const io = initializeSocket(server);
 
 // Set up middleware for parsing request bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // Keep this after body parsers
-
+app.use(cookieParser());
 
 // Use security middleware
 app.use(helmetMiddleware());
 app.use(limiter);
-// app.use(corsMiddleware)
-// app.use(potentialIntrusionMiddleware);
+app.use(corsMiddleware);
 app.use(loggingMiddleware);
 
+// Connect to MongoDB
 ConnectDB();
+
+// Make io accessible to routes
+app.set("io", io);
 
 // Set up routes
 app.use("/api/v1/users", userRoutes);
@@ -54,20 +58,16 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-app.use("/uploads", express.static(uploadsDir));
-
+// Test route
 app.get("/", (req, res) => {
-  res.send("Hello and Welcome to B-Hub. The server is running 🚀");
+  res.send("Hello and Welcome to B-Hub. The server is running ");
 });
-
-app.set("io", io);
 
 app.use(errorHandler);
 
-
-app.listen(PORT, () => {
-  console.log(`Server B-Hub is now starting on port ${PORT} ⚡`);
+// Use server.listen instead of app.listen
+server.listen(PORT, () => {
+  console.log(`Server B-Hub is now starting on port ${PORT} `);
 });
 
-
-export {app, server}
+export { app, server };
