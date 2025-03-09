@@ -6,7 +6,7 @@ const apiInstance = axios.create({
 });
 
 export const notificationApi = {
-  getAllNotifications: () => apiInstance.get("/api/notifications"),
-  markAsRead: (notificationId: string) => apiInstance.put(`/api/notifications/${notificationId}/read`),
-  getUnreadCount: () => apiInstance.get("/api/notifications/unread/count"),
+  getAllNotifications: () => apiInstance.get("/api/v1/notifications"),
+  markAsRead: (notificationId: string) => apiInstance.put(`/api/v1/notifications/${notificationId}/read`),
+  getUnreadCount: () => apiInstance.get("/api/v1/notifications/unread/count"),
 };

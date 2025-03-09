@@ -22,29 +22,33 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { User } from "@/types";
+import { useNotification } from "@/api/stores/useNotification";
 
 interface MainSidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
-
-
 const MainSidebar = ({ activeTab, setActiveTab }: MainSidebarProps) => {
-    const  { logout, currentUser } = useAuth()
-    const router = useRouter()
+  const { logout, currentUser } = useAuth();
+  const { unreadCount } = useNotification();
+  const router = useRouter();
 
-    const handleNavigation = (item: typeof navItems[0]) => {
-      setActiveTab(item.label)
-      router.push(item.path)
-    }
+  const handleNavigation = (item: (typeof navItems)[0]) => {
+    setActiveTab(item.label);
+    router.push(item.path);
+  };
 
-    const handleLogout = () => {
-        logout.mutate()
-        router.push("/")
-    }
+  const handleLogout = () => {
+    logout.mutate();
+    router.push("/");
+  };
   return (
-    <Sidebar variant="floating" collapsible="icon" className="-ml-2 -mt-3 h-[104vh]">
+    <Sidebar
+      variant="floating"
+      collapsible="icon"
+      className="-ml-2 -mt-3 h-[104vh]"
+    >
       <SidebarHeader>
         <div className="flex items-center gap-2 py-2">
           <span className="text-xl font-bold">B-Hub</span>
@@ -76,12 +80,19 @@ const MainSidebar = ({ activeTab, setActiveTab }: MainSidebarProps) => {
                   tooltip={item.label}
                   className="list-none"
                 >
-                 <Image 
-                    src={`/animations/${item.icon}`}
-                    alt={item.label}
-                    width={20}
-                    height={20}
-                  />
+                  <div className="relative">
+                    <Image
+                      src={`/animations/${item.icon}`}
+                      alt={item.label}
+                      width={20}
+                      height={20}
+                    />
+                    {item.id === "notifications" && unreadCount > 0 && (
+                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </div>
+                    )}
+                  </div>
                   <span className="list-none">{item.label}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -129,7 +140,7 @@ const MainSidebar = ({ activeTab, setActiveTab }: MainSidebarProps) => {
 
         <div className="p-4">
           <div className="flex items-center gap-3">
-            <Image 
+            <Image
               src={currentUser?.avatar || "/images/placeholder.jpg"}
               alt={currentUser?.userName || "User"}
               width={40}
@@ -137,8 +148,12 @@ const MainSidebar = ({ activeTab, setActiveTab }: MainSidebarProps) => {
               className="rounded-full"
             />
             <div className="flex flex-col">
-              <span className="font-medium">{currentUser?.firstName || "Utilisateur"}</span>
-              <span className="text-sm text-gray-500">{currentUser?.titleProfile || "Membre"}</span>
+              <span className="font-medium">
+                {currentUser?.firstName || "Utilisateur"}
+              </span>
+              <span className="text-sm text-gray-500">
+                {currentUser?.titleProfile || "Membre"}
+              </span>
             </div>
           </div>
         </div>

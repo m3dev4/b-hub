@@ -6,7 +6,7 @@ export const createNotification = async ({
   content,
   relatedPost = null,
   sender = null,
-}) => {
+}, io) => {
   try {
     const notification = new Notification({
       recipient,
@@ -16,6 +16,13 @@ export const createNotification = async ({
       sender,
     });
     await notification.save();
+    if (io) {
+      const populatedNotification = await Notification.findById(notification._id)
+        .populate("sender", "userName profilePicture")
+        .populate("relatedPost", "content");
+      
+      io.to(recipient.toString()).emit("notification", populatedNotification);
+    }
     return notification;
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -71,8 +78,8 @@ export const markNotificationsAsRead = async (req, res) => {
 export const getNotifications = async (userId) => {
   return Notification.find({ recipient: userId })
     .populate("sender")
-    .populate("releatedPost")
-    .sort({ createdAt });
+    .populate("relatedPost")
+    .sort({ createdAt : -1 });
 };
 
 export const markAsRead = async (notificationId) => {

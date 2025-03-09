@@ -19,8 +19,13 @@ export const useNotification = create<NotificationState>((set, get) => ({
 
   initializeSocket: (userId: string) => {
     if (!userId) {
-      console.error("No user ID provided for socket initialization");
+      console.error("Aucun ID utilisateur fourni pour l'initialisation du socket");
       return;
+    }
+
+    // Déconnexion du socket existant si présent
+    if (get().socket) {
+      get().socket.disconnect();
     }
 
     const socket = io(process.env.NEXT_PUBLIC_BASE_URL_SERVER || "http://localhost:8080", {
@@ -29,38 +34,51 @@ export const useNotification = create<NotificationState>((set, get) => ({
     });
 
     socket.on("connect", () => {
-      console.log("Socket connected");
+      console.log("Socket connecté avec succès");
     });
 
     socket.on("notification", (notification) => {
-      console.log("Received notification:", notification);
+      console.log("Notification reçue:", notification);
       get().addNotification(notification);
     });
 
     socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
+      console.error("Erreur de connexion socket:", error);
     });
 
     set({ socket });
+    
+    // Forcer un rechargement des notifications après connexion au socket
+    setTimeout(() => {
+      get().loadNotifications();
+    }, 500);
   },
 
   addNotification: (notification) => {
-    set((state) => ({
-      notifications: [notification, ...state.notifications],
-      unreadCount: state.unreadCount + 1,
-    }));
+    console.log("Ajout de la notification:", notification);
+    // Vérification pour éviter les doublons
+    set((state) => {
+      const exists = state.notifications.some(n => n._id === notification._id);
+      if (exists) return state;
+      
+      return {
+        notifications: [notification, ...state.notifications],
+        unreadCount: state.unreadCount + 1,
+      };
+    });
   },
 
   loadNotifications: async () => {
     try {
       const response = await notificationApi.getAllNotifications();
-      console.log("Loaded notifications:", response.data);
+      console.log("Réponse de l'API:", response);
+      console.log("Notifications chargées:", response.data);
       set({ 
         notifications: response.data,
         unreadCount: response.data.filter((n: any) => !n.read).length 
       });
     } catch (error) {
-      console.error("Error loading notifications:", error);
+      console.error("Erreur lors du chargement des notifications:", error);
     }
   },
 
@@ -71,10 +89,10 @@ export const useNotification = create<NotificationState>((set, get) => ({
         notifications: state.notifications.map((n) =>
           n._id === notificationId ? { ...n, read: true } : n
         ),
-        unreadCount: state.unreadCount - 1,
+        unreadCount: Math.max(0, state.unreadCount - 1),
       }));
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      console.error("Erreur lors du marquage de la notification comme lue:", error);
     }
   },
 }));

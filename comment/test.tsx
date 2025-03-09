@@ -1,66 +1,67 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/api/stores/useAuthStore";
 import { useNotification } from "@/api/stores/useNotification";
-import { useAuth } from "@/hooks/useAuth";
-import { User } from "@/types";
 import { formatDistanceToNow } from "date-fns";
-import React, { useEffect, useState } from "react";
 import { fr } from "date-fns/locale";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 const NotificationsPage = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const { currentUser } = useAuth();
+  const { user } = useAuthStore();
   const notificationStore = useNotification();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (currentUser) {
-      setUser(currentUser?._id);
-      console.log(currentUser);
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    const initializeNotitifications = async () => {
+    const initializeNotifications = async () => {
       try {
-        if (!currentUser?._id) {
-          console.log("No user found, waiting for authentication...");
+        if (!user?._id) {
+          console.log("Aucun utilisateur trouvé, en attente d'authentification...");
           return;
         }
 
-        console.log("Initializing notifications for user:", currentUser._id);
-        notificationStore.initializeSocket(currentUser._id);
+        console.log("Initialisation des notifications pour l'utilisateur:", user._id);
+        
+        // Réinitialisation complète du socket à chaque initialisation
+        notificationStore.initializeSocket(user._id);
+        
+        // Chargement initial des notifications
         await notificationStore.loadNotifications();
       } catch (error) {
-        console.error("Error initializing notifications:", error);
+        console.error("Erreur lors de l'initialisation des notifications:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    initializeNotitifications();
-
+    initializeNotifications();
+    
+    // Nettoyage lors du démontage du composant
     return () => {
       if (notificationStore.socket) {
         console.log("Déconnexion du socket lors du démontage");
         notificationStore.socket.disconnect();
       }
     };
-  }, [currentUser?._id]);
+  }, [user?._id]); // Dépendance sur user._id plutôt que sur tout l'objet user
 
+  // Rafraîchissement périodique des notifications
   useEffect(() => {
-    if (!currentUser?._id) return;
-
+    if (!user?._id) return;
+    
     const interval = setInterval(() => {
       notificationStore.loadNotifications();
-    }, 30000);
-
+    }, 30000); // Rafraîchir toutes les 30 secondes
+    
     return () => clearInterval(interval);
-  }, [currentUser?._id]);
+  }, [user?._id]);
 
-  if (!currentUser) {
-    return <div>Not authenticated</div>;
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-gray-600">Veuillez vous connecter pour voir vos notifications</p>
+      </div>
+    );
   }
 
   if (loading) {
@@ -71,11 +72,13 @@ const NotificationsPage = () => {
     );
   }
 
-  const formDate = (date: string) => {
-    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: fr})
-  }
+  const formatDate = (date: string) => {
+    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: fr });
+  };
 
+  // Affichage du nombre de notifications
   console.log(`Affichage de ${notificationStore.notifications.length} notifications, dont ${notificationStore.unreadCount} non lues`);
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Notifications</h1>
@@ -101,7 +104,7 @@ const NotificationsPage = () => {
                 <div className="flex-1">
                   <p className="text-gray-800">{notification.content}</p>
                   <p className="text-sm text-gray-500 mt-1">
-                    {formDate(notification.createdAt)}
+                    {formatDate(notification.createdAt)}
                   </p>
                 </div>
               </div>
@@ -124,7 +127,7 @@ const NotificationsPage = () => {
         </button>
       </div>
     </div>
-  )
+  );
 };
 
 export default NotificationsPage;

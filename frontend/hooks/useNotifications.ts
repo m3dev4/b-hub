@@ -10,7 +10,7 @@ export const useNotifications = (userId: string) => {
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ["notifications", userId],
-    queryFn: () => notificationApi.getNotifications(),
+    queryFn: () => notificationApi.getAllNotifications(),
     enabled: !!userId,
   });
 

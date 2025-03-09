@@ -41,7 +41,7 @@ app.use(loggingMiddleware);
 
 // Connect to MongoDB
 ConnectDB();
-
+ 
 // Make io accessible to routes
 app.set("io", io);
 
@@ -49,7 +49,7 @@ app.set("io", io);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
-app.use("/api/v1/recommendations", recommendationRoutes);
+app.use("/api/v1/recommendations", recommendationRoutes);  
 app.use("/api/follows", followRoutes);
 
 // Créer le dossier uploads s'il n'existe pas
